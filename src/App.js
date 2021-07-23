@@ -6,6 +6,7 @@ import Signup from './components/Signup';
 import Leaderboard from './components/Leaderboard';
 import Courses from './components/Courses';
 import Questions from './components/Questions';
+import Dashboard from './components/Dashboard';
 import {
 	BrowserRouter as Router,
 	Switch,
@@ -41,6 +42,9 @@ const App = () => {
 					</Route>
 					<Route path="/questions">
 						<Questions />
+					</Route>
+					<Route path="/dashboard">
+						<Dashboard />
 					</Route>
 				</Switch>
 			</Router>

@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react'
 import services from '../services/services'
 import { shuffle } from '../utils/utils'
 import { Card, Button, Alert } from 'react-bootstrap'
+import { useHistory } from 'react-router-dom'
+import { firestore } from '../firebase'
 
 export default function Questions() {
     const [questions, setQuestions] = useState(null)
@@ -10,8 +12,10 @@ export default function Questions() {
     const [score, setScore] = useState(0)
     const [isSuccess, setIsSuccess] = useState(null)
     const [alert, setAlert] = useState('')
+    const history = useHistory()
     useEffect(() => {
-        services.getAll()
+        const questionNumber = 10
+        services.getAll(questionNumber)
             .then(serverQuestions => {
                 setQuestions(serverQuestions.results)
             })
@@ -43,15 +47,22 @@ export default function Questions() {
     const handleOptionClick = (option) => {
         setCurrentQuestion(currentQuestion + 1)
         checkCorrect(option)
+        if (currentQuestion === 9) {
+            firestore.collection('leaderboard')
+                .add({
+                    // name,
+                    score
+                })
+
+            history.push('leaderboard')
+        }
     }
     const checkCorrect = (option) => {
         if (option.isCorrect) {
-            console.log('correct')
             setAlert('Correct')
             setIsSuccess(true)
             setScore(score + 1)
         } else {
-            console.log('wrong')
             setAlert('Wrong')
             setIsSuccess(false)
         }
