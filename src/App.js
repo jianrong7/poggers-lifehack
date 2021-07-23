@@ -5,15 +5,14 @@ import Login from './components/Login';
 import Signup from './components/Signup';
 import Leaderboard from './components/Leaderboard';
 import Courses from './components/Courses';
+import Questions from './components/Questions';
 import {
 	BrowserRouter as Router,
 	Switch,
-	Route,
-	Link
+	Route
   } from "react-router-dom";
   import { Container } from 'react-bootstrap'
 import { AuthProvider } from './contexts/AuthContext';
-import PrivateRoute from './components/PrivateRoute'
 
 const App = () => {
 	return (
@@ -21,6 +20,7 @@ const App = () => {
 			<Router>
 				<Menu />
 				<Switch>
+					<Route exact path="/" component={Home} />
 					<Route path="/signup">
 						<Container 
 							className="d-flex align-items-center justify-content-center"
@@ -39,7 +39,9 @@ const App = () => {
 					<Route path="/login">
 						<Login />
 					</Route>
-					<Route exact path="/" component={Home} />
+					<Route path="/questions">
+						<Questions />
+					</Route>
 				</Switch>
 			</Router>
 		</AuthProvider>
