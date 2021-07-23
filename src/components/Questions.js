@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import services from '../services/services'
 import { shuffle } from '../utils/utils'
-import { Alert } from 'react-bootstrap'
+import { Alert, Card, Button } from 'react-bootstrap'
 import { useHistory } from 'react-router-dom'
 import { firestore } from '../firebase'
 import firebase from 'firebase';
@@ -113,22 +113,24 @@ export default function Questions({ determineDifficulty, selectedSubject }) {
     }
     if (questions) {
         return (
-            <div>
-                <div key={questions[currentQuestion].question}>
-                    {isSuccess === null ? null : isSuccess === true ? <Alert variant='success'>{alert}</Alert> : <Alert variant='danger'>{alert}</Alert>}
-                    <p>Question {currentQuestion + 1}/{questions.length}</p>
-                    <p>Category: {questions[currentQuestion].category}</p>
-                    <p>{questions[currentQuestion].question}</p>
-                    {questionOptions === null ? null : shuffle(questionOptions[currentQuestion]).map(option => {
-                        return (
-                            <button key={option.option} onClick={() => handleOptionClick(option)}>
-                                {option.option}
-                            </button>
-                        )
-                    })}
-                    <p>Score: {score}</p>
-                </div>
-            </div>
+            <Card style={{ margin: '50px' }}>
+                <Card.Body className="text-center mb-4">
+                    <div key={questions[currentQuestion].question}>
+                        {isSuccess === null ? null : isSuccess === true ? <Alert variant='success'>{alert}</Alert> : <Alert variant='danger'>{alert}</Alert>}
+                        <h2>Question {currentQuestion + 1}/{questions.length}</h2>
+                        <h4>Category: {questions[currentQuestion].category}</h4>
+                        <h2>{questions[currentQuestion].question}</h2>
+                        {questionOptions === null ? null : shuffle(questionOptions[currentQuestion]).map(option => {
+                            return (
+                                <Button key={option.option} onClick={() => handleOptionClick(option)} style={{ backgroundColor: "#1E0973", margin: '10px' }}>
+                                    {option.option}
+                                </Button>
+                            )
+                        })}
+                        <h3>Score: {score}</h3>
+                    </div>
+                </Card.Body>
+            </Card>
         )
     } else {
         return null

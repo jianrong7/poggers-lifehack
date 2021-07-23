@@ -73,16 +73,18 @@ export default function Dashboard({ questionChange }) {
     if (userData) {
         return (
             <div>
-                <h1>Welcome {userData.name}!</h1>
-                <Button>
+                <div style={{ display: 'flex', justifyContent: 'space-around' }}>
+                    <h1>Welcome {userData.name}!</h1>
                     <Link to="/questions">
-                        Start
+                        <Button style={{ backgroundColor: "#1E0973" }}>
+                            Start your practice!
+                        </Button>
                     </Link>
-                </Button>
-                <Tabs onClick={handleTabClick} defaultActiveKey={userData.subjects[0].label} id="uncontrolled-tab-example" className="mb-3">
+                </div>
+                <Tabs onClick={handleTabClick} defaultActiveKey={userData.subjects[0].label} id="uncontrolled-tab-example" className="mb-3" style={{ margin: '30px' }}>
                     {userData.subjects.map(subject => {
                         return (
-                            <Tab eventKey={subject.label} title={subject.label} key={subject.label + subject.value}>
+                            <Tab eventKey={subject.label} title={subject.label} key={subject.label + subject.value} style={{ margin: '30px' }}>
                                 <DashboardTable userData={userData} subject={subject}/>
                             </Tab>
                         )
