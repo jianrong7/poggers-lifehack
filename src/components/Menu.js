@@ -5,10 +5,13 @@ const Menu = () => {
     return (
         <div>
             <div>
-                POGGERS
+                <Link to="/">POGGERS</Link>
             </div>
             <nav>
-                <Link to='/login' />
+                <Link to='/courses'>Our courses</Link>
+                <Link to='/leaderboard'>Leaderboard</Link>
+                <Link to='/signup'>Sign up</Link>
+                <Link to='/login'>Login</Link>
             </nav>
         </div>
     )
