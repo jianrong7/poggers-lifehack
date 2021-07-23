@@ -40,11 +40,11 @@ export default function Signup() {
       let response = await signup(emailRef.current.value, passwordRef.current.value)
       firestore.collection('users').doc(response.user.uid).set({
         name: nameRef.current.value,
-        score: {},
+        scores: [],
         subjects: selected
       })
 
-      history.push("/")
+      history.push("/dashboard")
     } catch {
       setError("Failed to create an account")
     }
@@ -84,7 +84,7 @@ export default function Signup() {
               labelledBy="Select"
               />
             </Form.Group>
-            <Button disabled={loading} className="w-100" type="submit">
+            <Button disabled={loading} className="w-100" type="submit" style={{ backgroundColor: "#1E0973", marginTop: '20px' }}>
               Sign Up
             </Button>
           </Form>

@@ -1,7 +1,8 @@
 import React, { useState } from 'react'
 import { Link, useHistory } from "react-router-dom";
-import { Button } from 'react-bootstrap';
+import { Button, Nav } from 'react-bootstrap';
 import { useAuth } from '../contexts/AuthContext';
+import logo from '../assets/logo.png'
 
 const Menu = () => {
     const [error, setError] = useState('')
@@ -18,31 +19,58 @@ const Menu = () => {
         }
     }
 
+    const style = {
+        display: 'flex',
+        justifyContent: 'space-between',
+        margin: '5px'
+    }
+    const logoStyle = {
+        height: '50px',
+        maxWidth: '50px'
+    }
     if (currentUser) {
         return (
-            <div>
-                <div>
-                    <Link to="/">POGGERS</Link>
-                </div>
-                <nav>
-                    <Link to='/courses'>Our courses</Link>
-                    <Link to='/leaderboard'>Leaderboard</Link>
-                    <Button variant="link" onClick={handleLogout}>Log out</Button>
-                </nav>
+            <div style={style}>
+                <Link to="/dashboard">
+                    <img src={logo} alt="POGGERS" style={logoStyle}/>
+                </Link>
+                <Nav className="justify-content-end">
+                    <Nav.Item>
+                        <Nav.Link href="/leaderboard">
+                            Leaderboard
+                        </Nav.Link>
+                    </Nav.Item>
+                    <Nav.Item>
+                        <Nav.Link onClick={handleLogout}>
+                            Log out
+                        </Nav.Link>
+                    </Nav.Item>
+                </Nav>
             </div>
         )
     } else {
         return (
-            <div>
-                <div>
-                    <Link to="/">POGGERS</Link>
-                </div>
-                <nav>
-                    <Link to='/courses'>Our courses</Link>
-                    <Link to='/leaderboard'>Leaderboard</Link>
-                    <Link to='/signup'>Sign up</Link>
-                    <Link to='/login'>Login</Link>
-                </nav>
+            <div style={style}>
+                <Link to="/">
+                    <img src={logo} alt="POGGERS" style={logoStyle}/>
+                </Link>
+                <Nav className="justify-content-end">
+                    <Nav.Item>
+                        <Nav.Link href="/leaderboard">
+                            Leaderboard
+                        </Nav.Link>
+                    </Nav.Item>
+                    <Nav.Item>
+                        <Nav.Link href="/signup">
+                        Sign up
+                        </Nav.Link>
+                    </Nav.Item>
+                    <Nav.Item>
+                        <Nav.Link href="/login">
+                        Login
+                        </Nav.Link>
+                    </Nav.Item>
+                </Nav>
             </div>
         )
     }

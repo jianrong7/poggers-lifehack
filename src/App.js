@@ -1,10 +1,9 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Home from './components/Home'
 import Menu from './components/Menu';
 import Login from './components/Login';
 import Signup from './components/Signup';
 import Leaderboard from './components/Leaderboard';
-import Courses from './components/Courses';
 import Questions from './components/Questions';
 import Dashboard from './components/Dashboard';
 import {
@@ -12,10 +11,20 @@ import {
 	Switch,
 	Route
   } from "react-router-dom";
-  import { Container } from 'react-bootstrap'
+import { Container } from 'react-bootstrap'
 import { AuthProvider } from './contexts/AuthContext';
 
 const App = () => {
+	const [determineDifficulty, setDetermineDifficulty] = useState(null)
+    const [selectedSubject, setSelectedSubject] = useState('')
+
+	const questionChange = (type, value) => {
+		if (type === 'difficulty') {
+			setDetermineDifficulty(value)
+		} else if (type === 'subject') {
+			setSelectedSubject(value)
+		}
+	}
 	return (
 		<AuthProvider>
 			<Router>
@@ -25,7 +34,7 @@ const App = () => {
 					<Route path="/signup">
 						<Container 
 							className="d-flex align-items-center justify-content-center"
-							style={{ minHeight: "100vh" }}>
+							style={{ minHeight: "80vh" }}>
 								<div className="w-100" style={{ maxWidth: "400px"}}>
 									<Signup />
 								</div>
@@ -34,17 +43,20 @@ const App = () => {
 					<Route path="/leaderboard">
 						<Leaderboard />
 					</Route>
-					<Route path="/courses">
-						<Courses />
-					</Route>
 					<Route path="/login">
-						<Login />
+						<Container 
+							className="d-flex align-items-center justify-content-center"
+							style={{ minHeight: "80vh" }}>
+								<div className="w-100" style={{ maxWidth: "400px"}}>
+								<Login />
+								</div>
+						</Container>
 					</Route>
 					<Route path="/questions">
-						<Questions />
+						<Questions determineDifficulty={determineDifficulty} selectedSubject={selectedSubject}/>
 					</Route>
 					<Route path="/dashboard">
-						<Dashboard />
+						<Dashboard questionChange={questionChange}/>
 					</Route>
 				</Switch>
 			</Router>

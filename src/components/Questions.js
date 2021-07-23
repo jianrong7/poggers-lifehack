@@ -1,24 +1,48 @@
 import React, { useState, useEffect } from 'react'
 import services from '../services/services'
 import { shuffle } from '../utils/utils'
-import { Card, Button, Alert } from 'react-bootstrap'
+import { Alert } from 'react-bootstrap'
 import { useHistory } from 'react-router-dom'
 import { firestore } from '../firebase'
+import firebase from 'firebase';
+import { useAuth } from '../contexts/AuthContext'
 
-export default function Questions() {
+export default function Questions({ determineDifficulty, selectedSubject }) {
     const [questions, setQuestions] = useState(null)
+    const [difficulty, setDifficulty] = useState(determineDifficulty)
+    const [subject, setSubject] = useState(selectedSubject)
     const [currentQuestion, setCurrentQuestion] = useState(0)
     const [questionOptions, setQuestionOptions] = useState(null)
     const [score, setScore] = useState(0)
     const [isSuccess, setIsSuccess] = useState(null)
     const [alert, setAlert] = useState('')
     const history = useHistory()
+    const { currentUser } = useAuth()
     useEffect(() => {
-        const questionNumber = 10
-        services.getAll(questionNumber)
+        if (selectedSubject === 'Mathematics') {
+            services.getAll(difficulty, 19)
             .then(serverQuestions => {
                 setQuestions(serverQuestions.results)
             })
+        } else if (selectedSubject === 'Geography') {
+            services.getAll(difficulty, 22)
+            .then(serverQuestions => {
+                setQuestions(serverQuestions.results)
+            })
+        } else if (selectedSubject === 'History') {
+            services.getAll(difficulty, 23)
+            .then(serverQuestions => {
+                setQuestions(serverQuestions.results)
+            })
+        } else if (selectedSubject === 'Art') {
+            services.getAll(difficulty, 25)
+            .then(serverQuestions => {
+                setQuestions(serverQuestions.results)
+            })
+        }
+        return (
+            setQuestions(null)
+        )
     }, [])
     useEffect(() => {
         if (questions) {
@@ -43,18 +67,38 @@ export default function Questions() {
             setQuestionOptions(temp)
         }
     }, [questions])
+    useEffect(() => {
+        setDifficulty(determineDifficulty)
+        if (selectedSubject === 'Mathematics') {
+            setSubject({ label: 'Mathematics', value: 19 })
+        } else if (selectedSubject === 'Geography') {
+            setSubject({ label: "Geography", value: 22 })
+        } else if (selectedSubject === 'History') {
+            setSubject({ label: "History", value: 23 })
+        } else if (selectedSubject === 'Art') {
+            setSubject({ label: "Art", value: 25 })
+        }
+    }, [determineDifficulty, selectedSubject])
 
-    const handleOptionClick = (option) => {
+    const handleOptionClick = async (option) => {
         setCurrentQuestion(currentQuestion + 1)
         checkCorrect(option)
         if (currentQuestion === 9) {
-            firestore.collection('leaderboard')
-                .add({
-                    // name,
-                    score
+            setQuestions(null)
+            await firestore.collection('users')
+                .doc(currentUser.uid)
+                .update({
+                    scores: firebase.firestore.FieldValue.arrayUnion({
+                        date: Date.now(),
+                        difficulty,
+                        score,
+                        subject: subject.label
+                    })
                 })
+                .catch(error => console.log("error writing document: ", error))
 
-            history.push('leaderboard')
+            setCurrentQuestion(0)
+            history.push('/leaderboard')
         }
     }
     const checkCorrect = (option) => {

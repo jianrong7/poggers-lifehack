@@ -1,14 +1,23 @@
 import React, { useState } from 'react'
-import { Link, useHistory } from 'react-router-dom'
-import { Card, Button, Alert } from 'react-bootstrap'
+import { Link } from 'react-router-dom'
+import { Card, Alert } from 'react-bootstrap'
 import { useAuth } from '../contexts/AuthContext'
+import { Button } from 'react-bootstrap'
 
 
 const Home = () => {
     const [error, setError] = useState('')
-    const { currentUser, logout } = useAuth()
-    const history = useHistory()
+    const { currentUser } = useAuth()
 
+    const style = {
+        display: 'flex',
+        flexDirection: 'column',
+        flexWrap: 'wrap',
+        alignItems: 'flex-start',
+        alignContent: 'center',
+        justifyContent: 'center',
+        height: '80vh'
+    }
     if (currentUser) {
         return (
             <div>
@@ -26,10 +35,10 @@ const Home = () => {
         )
     } else {
         return (
-            <div>
+            <div style={style}>
                 <h1>Revolutionising how we learn and teach</h1>
                 <h2>A safe, exciting and effective tool for all learners and educators</h2>
-                <button><Link to="/signup">Sign up now</Link></button>
+                <Link to="/signup"><Button style={{ backgroundColor: "#1E0973"}}>Sign up now</Button></Link>
             </div>
         )
     }
