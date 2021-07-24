@@ -24,9 +24,6 @@ const App = () => {
 			setSelectedSubject(value)
 		}
 	}
-	useEffect(() => {
-		console.log(selectedSubject)
-	})
 	return (
 		<AuthProvider>
 			<Router>

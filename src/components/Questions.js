@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import services from '../services/services'
-import { shuffle, collateOptions } from '../utils/utils'
+import { shuffle, collateOptions, getDate } from '../utils/utils'
 import { Alert, Card, Button } from 'react-bootstrap'
 import { useHistory } from 'react-router-dom'
 import { firestore } from '../firebase'
 import firebase from 'firebase';
 import { useAuth } from '../contexts/AuthContext'
+import { uniqueId } from 'lodash'
 
 export default function Questions({ determineDifficulty, selectedSubject }) {
     const [questions, setQuestions] = useState(null)
@@ -16,8 +17,11 @@ export default function Questions({ determineDifficulty, selectedSubject }) {
     const [score, setScore] = useState(0)
     const [isSuccess, setIsSuccess] = useState(null)
     const [alert, setAlert] = useState('')
+
     const history = useHistory()
+
     const { currentUser } = useAuth()
+
     useEffect(() => {
         if (selectedSubject === 'Mathematics') {
             services.getAll(difficulty, 19)
@@ -49,52 +53,37 @@ export default function Questions({ determineDifficulty, selectedSubject }) {
             setQuestionOptions(collateOptions(questions))
         }
     }, [questions])
-    // useEffect(() => {
-    //     setDifficulty(determineDifficulty)
-    //     if (selectedSubject === 'Mathematics') {
-    //         setSubject({ label: 'Mathematics', value: 19 })
-    //     } else if (selectedSubject === 'Geography') {
-    //         setSubject({ label: "Geography", value: 22 })
-    //     } else if (selectedSubject === 'History') {
-    //         setSubject({ label: "History", value: 23 })
-    //     } else if (selectedSubject === 'Art') {
-    //         setSubject({ label: "Art", value: 25 })
-    //     }
-    // }, [determineDifficulty, selectedSubject])
 
     const handleOptionClick = async (option) => {
-        setCurrentQuestion(currentQuestion + 1)
-        checkCorrect(option)
+        setCurrentQuestion(prevQuestion => prevQuestion + 1)
         if (currentQuestion === 9) {
+            let newScore = score
+            if (option.isCorrect) {
+                newScore += 1
+            }
+            setCurrentQuestion(0)
+            history.push('/dashboard')
             setQuestions(null)
-            const dateObj = new Date();
-            const month = dateObj.getUTCMonth() + 1; //months from 1-12
-            const day = dateObj.getUTCDate();
-            const year = dateObj.getUTCFullYear();
 
-            const newdate = year + "/" + month + "/" + day;
             await firestore.collection('users')
                 .doc(currentUser.uid)
                 .update({
                     scores: firebase.firestore.FieldValue.arrayUnion({
-                        date: newdate,
+                        id: uniqueId(),
+                        date: getDate(),
                         difficulty,
-                        score,
+                        score: newScore,
                         subject
                     })
-                })
-                .then(() => {
-                    setCurrentQuestion(0)
-                    history.push('/dashboard')
-                })
-                .catch(error => console.log("error writing document: ", error))
+                }).catch(error => console.log("error writing document: ", error))
         }
+        checkCorrect(option)
     }
     const checkCorrect = (option) => {
         if (option.isCorrect) {
             setAlert('Correct')
             setIsSuccess(true)
-            setScore(score + 1)
+            setScore(prevScore => prevScore + 1)
         } else {
             setAlert('Wrong')
             setIsSuccess(false)
@@ -109,7 +98,6 @@ export default function Questions({ determineDifficulty, selectedSubject }) {
                         <div>
                             <h2>Question {currentQuestion + 1}/{questions.length}</h2>
                             <h4>Category: {questions[currentQuestion].category}</h4>
-                            {console.log(questions[currentQuestion].question)}
                             <h2>{JSON.parse( JSON.stringify(questions[currentQuestion].question) )}</h2>
                             {questionOptions === null ? null : shuffle(questionOptions[currentQuestion]).map(option => {
                                 return (
@@ -120,7 +108,6 @@ export default function Questions({ determineDifficulty, selectedSubject }) {
                             })}
                             <h3>Score: {score}</h3>
                         </div>
-
                     </div>
                 </Card.Body>
             </Card>

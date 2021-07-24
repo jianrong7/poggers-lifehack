@@ -28,16 +28,13 @@ export default function Dashboard({ questionChange }) {
                 setSelectedSubject(userData.subjects[0].label)
 
                 setComputedScoreObjState(computedScoreForAlgorithm(userData, selectedSubject))
-
             }
         }
     })
     useEffect(() => {
         if (computedScoreObjState) {
             const computedScore = computedScoreObjState.easy.averageScore + computedScoreObjState.medium.averageScore + computedScoreObjState.hard.averageScore
-            console.log(computedScore)
             setProgressBarStatus(setProgressBarStatusAlgorithm(computedScoreObjState))
-            console.log(progressBarStatus)
     
             if (computedScore < 1.4) {
                 questionChange('difficulty', 'easy')
