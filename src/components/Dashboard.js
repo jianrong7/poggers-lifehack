@@ -2,17 +2,21 @@ import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { firestore } from '../firebase'
-import { Button, Tabs, Tab } from 'react-bootstrap'
+import { Button, Tabs, Tab, ProgressBar } from 'react-bootstrap'
 import DashboardTable from './DashboardTable'
+import { computedScoreForAlgorithm, setProgressBarStatusAlgorithm } from '../utils/utils'
 
 export default function Dashboard({ questionChange }) {
     const [userData, setUserData] = useState(null)
     const [selectedSubject, setSelectedSubject] = useState('')
+    const [computedScoreObjState, setComputedScoreObjState] = useState(null)
+    const [progressBarStatus, setProgressBarStatus] = useState(null)
     const { currentUser } = useAuth()
     useEffect(() => {
         firestore.collection('users').doc(currentUser.uid).get().then(doc => {
             if (doc.exists) {
                 setUserData(doc.data())
+                questionChange('subject', doc.data().subjects[0].label)
             } else {
                 console.log("Unable to retrieve user")
             }
@@ -20,43 +24,21 @@ export default function Dashboard({ questionChange }) {
     }, [])
     useEffect(() => {
         if (userData) {
-            setSelectedSubject(userData.subjects[0].label)
-            let computedScoreObj = {
-                easy: {
-                    totalScore: 0,
-                    totalTests: 0,
-                    averageScore: 0
-                },
-                medium: {
-                    totalScore: 0,
-                    totalTests: 0,
-                    averageScore: 0
-                },
-                hard: {
-                    totalScore: 0,
-                    totalTests: 0,
-                    averageScore: 0
-                }
-            }
-            userData.scores.forEach(score => {
-                if (score.subject === selectedSubject) {
-                    if (score.difficulty === 'easy') {
-                        computedScoreObj.easy.totalScore += score.score / 10
-                        computedScoreObj.easy.totalTests += 1
-                    } else if (score.difficulty === 'medium') {
-                        computedScoreObj.medium.totalScore += (score.score / 10) * 2
-                        computedScoreObj.medium.totalTests += 1
-                    } else {
-                        computedScoreObj.hard.totalScore += (score.score / 10) * 3
-                        computedScoreObj.hard.totalTests += 1
-                    }
-                }
-            })
-            computedScoreObj.easy.averageScore = (computedScoreObj.easy.totalScore / computedScoreObj.easy.totalTests) || 0
-            computedScoreObj.medium.averageScore = (computedScoreObj.medium.totalScore / computedScoreObj.medium.totalTests) || 0
-            computedScoreObj.hard.averageScore = (computedScoreObj.hard.totalScore / computedScoreObj.hard.totalTests) || 0
-            const computedScore = computedScoreObj.easy.averageScore + computedScoreObj.medium.averageScore + computedScoreObj.hard.averageScore
+            if (!progressBarStatus) {
+                setSelectedSubject(userData.subjects[0].label)
 
+                setComputedScoreObjState(computedScoreForAlgorithm(userData, selectedSubject))
+
+            }
+        }
+    })
+    useEffect(() => {
+        if (computedScoreObjState) {
+            const computedScore = computedScoreObjState.easy.averageScore + computedScoreObjState.medium.averageScore + computedScoreObjState.hard.averageScore
+            console.log(computedScore)
+            setProgressBarStatus(setProgressBarStatusAlgorithm(computedScoreObjState))
+            console.log(progressBarStatus)
+    
             if (computedScore < 1.4) {
                 questionChange('difficulty', 'easy')
             }  else if (computedScore < 2.4) {
@@ -65,7 +47,7 @@ export default function Dashboard({ questionChange }) {
                 questionChange('difficulty', 'hard')
             }
         }
-    })
+    }, [computedScoreObjState])
     const handleTabClick = (e) => {
         questionChange('subject', e.target.textContent)
         setSelectedSubject(e.target.textContent)
@@ -81,6 +63,15 @@ export default function Dashboard({ questionChange }) {
                         </Button>
                     </Link>
                 </div>
+                {progressBarStatus 
+                ? 
+                <ProgressBar style={{ margin: '50px 30px 0 30px' }}>
+                    <ProgressBar now={progressBarStatus.easy} label={`Easy: ${progressBarStatus.easy}%`} variant="success" animated key={1} />
+                    <ProgressBar now={progressBarStatus.medium} label={`Medium: ${progressBarStatus.medium}%`} variant="warning" animated key={2} />
+                    <ProgressBar now={progressBarStatus.hard} label={`Hard: ${progressBarStatus.hard}%`} variant="danger" animated key={3} />
+                </ProgressBar>
+                : 
+                null}
                 <Tabs onClick={handleTabClick} defaultActiveKey={userData.subjects[0].label} id="uncontrolled-tab-example" className="mb-3" style={{ margin: '30px' }}>
                     {userData.subjects.map(subject => {
                         return (

@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Link, useHistory } from "react-router-dom";
-import { Button, Nav } from 'react-bootstrap';
+import { Nav } from 'react-bootstrap';
 import { useAuth } from '../contexts/AuthContext';
 import logo from '../assets/logo.png'
 
@@ -36,8 +36,8 @@ const Menu = () => {
                 </Link>
                 <Nav className="justify-content-end">
                     <Nav.Item>
-                        <Nav.Link href="/leaderboard">
-                            Leaderboard
+                        <Nav.Link href="/">
+                            Account settings
                         </Nav.Link>
                     </Nav.Item>
                     <Nav.Item>
@@ -55,11 +55,6 @@ const Menu = () => {
                     <img src={logo} alt="POGGERS" style={logoStyle}/>
                 </Link>
                 <Nav className="justify-content-end">
-                    <Nav.Item>
-                        <Nav.Link href="/leaderboard">
-                            Leaderboard
-                        </Nav.Link>
-                    </Nav.Item>
                     <Nav.Item>
                         <Nav.Link href="/signup">
                         Sign up

@@ -6,9 +6,7 @@ export default function DashboardTable({ userData, subject }) {
         <Table striped bordered hover>
             <thead>
                 <tr>
-                    <th></th>
                     <th>Date</th>
-                    <th>Subject</th>
                     <th>Score</th>
                     <th>Difficulty</th>
                 </tr>
@@ -18,9 +16,7 @@ export default function DashboardTable({ userData, subject }) {
                     if (score.subject === subject.label) {
                         return (
                             <tr key={score.date + index}>
-                                <td>{index + 1}</td>
-                                <td>{new Date(score.date * 1000).toDateString()}</td>
-                                <td>{score.subject}</td>
+                                <td>{score.date}</td>
                                 <td>{score.score}</td>
                                 <td>{score.difficulty}</td>
                             </tr>

@@ -1,9 +1,8 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Home from './components/Home'
 import Menu from './components/Menu';
 import Login from './components/Login';
 import Signup from './components/Signup';
-import Leaderboard from './components/Leaderboard';
 import Questions from './components/Questions';
 import Dashboard from './components/Dashboard';
 import {
@@ -25,6 +24,9 @@ const App = () => {
 			setSelectedSubject(value)
 		}
 	}
+	useEffect(() => {
+		console.log(selectedSubject)
+	})
 	return (
 		<AuthProvider>
 			<Router>
@@ -39,9 +41,6 @@ const App = () => {
 									<Signup />
 								</div>
 						</Container>
-					</Route>
-					<Route path="/leaderboard">
-						<Leaderboard />
 					</Route>
 					<Route path="/login">
 						<Container 

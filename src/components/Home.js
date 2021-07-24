@@ -20,25 +20,23 @@ const Home = () => {
     }
     if (currentUser) {
         return (
-            <div>
-                <Card>
-                    <Card.Body>
-                        <h2 className="text-center mb-4">Profile</h2>
-                        {error && <Alert variant="danger">{error}</Alert>}
-                        <strong>Email: </strong> {currentUser.email}
-                        <Link to="/update-profile" className="btn btn-primary w-100 mt-3">
-                            Update Profile
-                        </Link>
-                    </Card.Body>
-                </Card>
-            </div>
+            <Card className="text-center mt-3" style={{ margin: '100px' }}>
+                <Card.Body>
+                    <h2 className="text-center mb-4">Profile</h2>
+                    {error && <Alert variant="danger">{error}</Alert>}
+                    <strong>Email: </strong> {currentUser.email}
+                    <Link to="/dashboard" className="btn btn-primary w-100 mt-3" style={{ backgroundColor: "#1E0973" }}>
+                        Update Profile
+                    </Link>
+                </Card.Body>
+            </Card>
         )
     } else {
         return (
             <div style={style}>
                 <h1>Revolutionising how we learn and teach</h1>
                 <h2>A safe, exciting and effective tool for all learners and educators</h2>
-                <Link to="/signup"><Button style={{ backgroundColor: "#1E0973"}}>Sign up now</Button></Link>
+                <Link to="/signup"><Button style={{ backgroundColor: "#1E0973" }}>Sign up now</Button></Link>
             </div>
         )
     }

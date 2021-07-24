@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import services from '../services/services'
-import { shuffle } from '../utils/utils'
+import { shuffle, collateOptions } from '../utils/utils'
 import { Alert, Card, Button } from 'react-bootstrap'
 import { useHistory } from 'react-router-dom'
 import { firestore } from '../firebase'
@@ -46,59 +46,48 @@ export default function Questions({ determineDifficulty, selectedSubject }) {
     }, [])
     useEffect(() => {
         if (questions) {
-            let temp = []
-            questions.map(question => {
-                let options = []
-                if (question.incorrect_answers.length === 1) {
-                    options = [
-                        { option: question.correct_answer, isCorrect: true },
-                        { option: question.incorrect_answers[0], isCorrect: false }
-                    ]
-                } else {
-                    options = [
-                        { option: question.correct_answer, isCorrect: true },
-                        { option: question.incorrect_answers[0], isCorrect: false },
-                        { option: question.incorrect_answers[1], isCorrect: false },
-                        { option: question.incorrect_answers[2], isCorrect: false }
-                    ]
-                }
-                temp.push(options)
-            })
-            setQuestionOptions(temp)
+            setQuestionOptions(collateOptions(questions))
         }
     }, [questions])
-    useEffect(() => {
-        setDifficulty(determineDifficulty)
-        if (selectedSubject === 'Mathematics') {
-            setSubject({ label: 'Mathematics', value: 19 })
-        } else if (selectedSubject === 'Geography') {
-            setSubject({ label: "Geography", value: 22 })
-        } else if (selectedSubject === 'History') {
-            setSubject({ label: "History", value: 23 })
-        } else if (selectedSubject === 'Art') {
-            setSubject({ label: "Art", value: 25 })
-        }
-    }, [determineDifficulty, selectedSubject])
+    // useEffect(() => {
+    //     setDifficulty(determineDifficulty)
+    //     if (selectedSubject === 'Mathematics') {
+    //         setSubject({ label: 'Mathematics', value: 19 })
+    //     } else if (selectedSubject === 'Geography') {
+    //         setSubject({ label: "Geography", value: 22 })
+    //     } else if (selectedSubject === 'History') {
+    //         setSubject({ label: "History", value: 23 })
+    //     } else if (selectedSubject === 'Art') {
+    //         setSubject({ label: "Art", value: 25 })
+    //     }
+    // }, [determineDifficulty, selectedSubject])
 
     const handleOptionClick = async (option) => {
         setCurrentQuestion(currentQuestion + 1)
         checkCorrect(option)
         if (currentQuestion === 9) {
             setQuestions(null)
+            const dateObj = new Date();
+            const month = dateObj.getUTCMonth() + 1; //months from 1-12
+            const day = dateObj.getUTCDate();
+            const year = dateObj.getUTCFullYear();
+
+            const newdate = year + "/" + month + "/" + day;
             await firestore.collection('users')
                 .doc(currentUser.uid)
                 .update({
                     scores: firebase.firestore.FieldValue.arrayUnion({
-                        date: Date.now(),
+                        date: newdate,
                         difficulty,
                         score,
-                        subject: subject.label
+                        subject
                     })
                 })
+                .then(() => {
+                    setCurrentQuestion(0)
+                    history.push('/dashboard')
+                })
                 .catch(error => console.log("error writing document: ", error))
-
-            setCurrentQuestion(0)
-            history.push('/leaderboard')
         }
     }
     const checkCorrect = (option) => {
@@ -116,18 +105,22 @@ export default function Questions({ determineDifficulty, selectedSubject }) {
             <Card style={{ margin: '50px' }}>
                 <Card.Body className="text-center mb-4">
                     <div key={questions[currentQuestion].question}>
-                        {isSuccess === null ? null : isSuccess === true ? <Alert variant='success'>{alert}</Alert> : <Alert variant='danger'>{alert}</Alert>}
-                        <h2>Question {currentQuestion + 1}/{questions.length}</h2>
-                        <h4>Category: {questions[currentQuestion].category}</h4>
-                        <h2>{questions[currentQuestion].question}</h2>
-                        {questionOptions === null ? null : shuffle(questionOptions[currentQuestion]).map(option => {
-                            return (
-                                <Button key={option.option} onClick={() => handleOptionClick(option)} style={{ backgroundColor: "#1E0973", margin: '10px' }}>
-                                    {option.option}
-                                </Button>
-                            )
-                        })}
-                        <h3>Score: {score}</h3>
+                        {isSuccess === null ? <Alert style={{ backgroundColor:'white', color:"white" }}>null</Alert> : isSuccess === true ? <Alert variant='success'>{alert}</Alert> : <Alert variant='danger'>{alert}</Alert>}
+                        <div>
+                            <h2>Question {currentQuestion + 1}/{questions.length}</h2>
+                            <h4>Category: {questions[currentQuestion].category}</h4>
+                            {console.log(questions[currentQuestion].question)}
+                            <h2>{JSON.parse( JSON.stringify(questions[currentQuestion].question) )}</h2>
+                            {questionOptions === null ? null : shuffle(questionOptions[currentQuestion]).map(option => {
+                                return (
+                                    <Button key={option.option} onClick={() => handleOptionClick(option)} style={{ backgroundColor: "#1E0973", margin: '10px' }}>
+                                        {option.option}
+                                    </Button>
+                                )
+                            })}
+                            <h3>Score: {score}</h3>
+                        </div>
+
                     </div>
                 </Card.Body>
             </Card>
